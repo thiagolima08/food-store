@@ -3,8 +3,10 @@ package br.edu.ifpb.padroes.service.order;
 import br.edu.ifpb.padroes.domain.Order;
 import br.edu.ifpb.padroes.service.log.LogHandler;
 import br.edu.ifpb.padroes.service.log.LogService;
+import br.edu.ifpb.padroes.service.mail.EmailNotificationOrderCancel;
+import br.edu.ifpb.padroes.service.mail.EmailNotificationOrderRefused;
 import br.edu.ifpb.padroes.service.payment.PaymentService;
-import br.edu.ifpb.padroes.service.mail.EmailNotification;
+import br.edu.ifpb.padroes.service.mail.EmailNotificationOrderSucess;
 
 public class OrderManager {
 
@@ -14,7 +16,9 @@ public class OrderManager {
 
     private Order order;
 
-    private EmailNotification emailNotification = new EmailNotification();
+    private EmailNotificationOrderSucess emailNotificationOrderSucess = new EmailNotificationOrderSucess();
+    private EmailNotificationOrderCancel emailNotificationOrderCancel = new EmailNotificationOrderCancel();
+    private EmailNotificationOrderRefused emailNotificationOrderRefused = new EmailNotificationOrderRefused();
 
     private PaymentService paymentService = new PaymentService();
 
@@ -25,18 +29,18 @@ public class OrderManager {
         try {
             paymentService.doPayment(paymentType);
             order.setStatus(Order.OrderStatus.PAYMENT_SUCCESS);
-            emailNotification.sendMailNotification(String.format("Order %d completed successfully", order.getId()));
+            emailNotificationOrderSucess.sendMailNotification(String.format("Order %d completed successfully", order.getId()));
             logService.info("payment finished");
         } catch (Exception e) {
             logService.error("payment refused");
             order.setStatus(Order.OrderStatus.PAYMENT_REFUSED);
-            emailNotification.sendMailNotification(String.format("Order %d refused", order.getId()));
+            emailNotificationOrderRefused.sendMailNotification(String.format("Order %d refused", order.getId()));
         }
     }
 
     public void cancelOrder() {
         order.setStatus(Order.OrderStatus.CANCELED);
-        emailNotification.sendMailNotification(String.format("Order %d canceled", order.getId()));
+        emailNotificationOrderCancel.sendMailNotification(String.format("Order %d canceled", order.getId()));
         logService.debug(String.format("order %d canceled", order.getId()));
     }
 

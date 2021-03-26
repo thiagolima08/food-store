@@ -1,6 +1,6 @@
 package br.edu.ifpb.padroes.service.log;
 
-public class LogService {
+public class LogService{
 
     public LogService(LogHandler logHandler) {
         this.logHandler = logHandler;
